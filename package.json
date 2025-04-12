@@ -17,6 +17,7 @@
   "homepage": "https://github.com/aket0r/node-basics-aket0r#readme",
   "description": "",
   "dependencies": {
+    "chalk": "^5.4.1",
     "fs": "^0.0.1-security",
     "readline": "^1.3.0"
   }
