@@ -1,6 +1,5 @@
 const fs = require("fs");
 const readline = require("readline");
-const { callbackify } = require("util");
 const chalk = require("chalk").default;
 
 
