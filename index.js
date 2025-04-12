@@ -85,10 +85,8 @@ Command: ${chalk.greenBright('unlink')} [file] | ${chalk.magenta('Delete file/di
     }
 
     if (cmd.includes('readdir')) {
-        const input = cmd.split('readdir')[1];
-        const [text, rawPath] = input.split(' ');
-        const cleanedPath = rawPath.trim().replace(/^["']|["']$/g, '');
-        terminal.readdir(cleanedPath);
+        const input = cmd.split('readdir')[1].trim();
+        terminal.readdir(input);
         rl.close();
         return;
     }
