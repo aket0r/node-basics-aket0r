@@ -2,26 +2,43 @@ const fs = require("fs");
 const readline = require("readline");
 const chalk = require("chalk").default;
 
+
 class TerminalCmds {
-    readdir(path = 'C:/') {
-        fs.readdir(path, (err, files) => {
+    isDirectory(path) {
+        fs.stat(path, (err, stats) => {
             if (err) {
                 console.log(`${chalk.bgRed('[ERROR]')} ${err}`);
                 throw err;
             }
 
-            console.log(`${chalk.bgGreen('[readdir]')} ${chalk.cyan(files)}`);
+            if (stats.isFile()) {
+                this.readFile(path);
+                console.log(`${chalk.bgMagentaBright('[REDIRECT]')} redirecting to readFile function...\n`);
+            }
+        });
+    }
+
+    readdir(path = 'C:/') {
+        const res = this.isDirectory(path);
+
+        fs.readdir(path, (err, files) => {
+            if (err) {
+                console.log(`${chalk.bgRed('[ERROR]')} ${err.message} | ${err.errno}`);
+                return;
+            }
+            
+            console.log(`\n${chalk.bgMagenta('[readdir]')}`, files);
         })
     }
 
-    readFile(file, isOpen = false) {
+    readFile(file) {
         fs.readFile(file, 'utf-8', function(err, data) {
             if (err) {
-                console.log(`${chalk.bgRed('[ERROR]')} ${err}`);
+                console.log(`${chalk.bgRed('[ERROR]')} ${err.message} | ${err.errno}`);
                 throw err;
             }
 
-            console.log(`${chalk.bgGreen('[readFile]')} ${chalk.cyan(data)}`);
+            console.log(`\n${chalk.bgMagenta('[readFile]')} ${data}`);
             return data;
         });
     }
@@ -29,21 +46,21 @@ class TerminalCmds {
     appendFile(file, text) {
         fs.appendFile(file, text, (err) => {
             if (err) {
-                console.log(`${chalk.bgRed('[ERROR]')} ${err}`);
+                console.log(`${chalk.bgRed('[ERROR]')} ${err.message} | ${err.errno}`);
                 throw err;
             }
 
-            console.log(`${chalk.bgGreen('[appendFile]')} The "${chalk.greenBright(text)}" was appended to ${chalk.greenBright(file)}!`);
+            console.log(`\n${chalk.bgMagenta('[appendFile]')} The "${chalk.greenBright(text)}" was appended to ${chalk.greenBright(file)}!`);
         })
     }
 
     unlink(file) {
         fs.unlink(file, (err, res) => {
             if (err) {
-                console.log(`${chalk.bgRed('[ERROR]')} ${err}`);
+                console.log(`${chalk.bgRed('[ERROR]')} ${err.message} | ${err.errno}`);
                 throw err;
             }
-            console.log(res || `[${chalk.bgGreen('[unlink]')}] "${chalk.redBright(file)}" deleted successfully!`);
+            console.log(`\n${chalk.bgMagenta('[unlink]')} "${chalk.redBright(file)}" deleted successfully!`);
             return 'unlink: success!'
         })
     }
@@ -56,11 +73,11 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-rl.question('Enter some command (or help): ', cmd => {
+rl.question('Enter command here (or help): ', cmd => {
     if (cmd === 'help') {
         console.log(`Commands (4):
 Command: ${chalk.greenBright('readdir')} [file] | ${chalk.magenta('Read directory (and show list of files)')} | Example: ${chalk.cyanBright('readdir C:/Documents/')}
-Command: ${chalk.greenBright('readfile')} [file] [false/true] | ${chalk.magenta('Open or read file')} | Example: ${chalk.cyanBright('readfile C:/Documents/file.txt false')}
+Command: ${chalk.greenBright('readfile')} [file] | ${chalk.magenta('Read file')} | Example: ${chalk.cyanBright('readfile C:/Documents/file.txt')}
 Command: ${chalk.greenBright('appendfile')}  [file] [text] | ${chalk.magenta('Add text to file')} | Example: ${chalk.cyanBright('appendfile C:/Documents/file.txt hello world')}
 Command: ${chalk.greenBright('unlink')} [file] | ${chalk.magenta('Delete file/directory')} | Example: ${chalk.cyanBright('readdir C:/Documents/')}`);
         rl.close();
@@ -78,8 +95,7 @@ Command: ${chalk.greenBright('unlink')} [file] | ${chalk.magenta('Delete file/di
 
     if (cmd.includes('readfile')) {
         const file = cmd.split(' ')[1];
-        const open = cmd.split(' ')[2];
-        terminal.readFile(file, open);
+        terminal.readFile(file);
         rl.close();
         return;
     }
